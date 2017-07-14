@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+/// 每一个下载任务就是一个新DownLoad， 便于缓存和管理
 class Download {
   
   var track: Track
