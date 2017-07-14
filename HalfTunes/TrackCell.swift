@@ -1,33 +1,3 @@
-/**
- * Copyright (c) 2017 Razeware LLC
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
- * distribute, sublicense, create a derivative work, and/or sell copies of the
- * Software in any work that is designed, intended, or marketed for pedagogical or
- * instructional purposes related to programming, coding, application development,
- * or information technology.  Permission for such use, copying, modification,
- * merger, publication, distribution, sublicensing, creation of derivative works,
- * or sale is expressly withheld.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
 import UIKit
 
 protocol TrackCellDelegate {
@@ -67,18 +37,35 @@ class TrackCell: UITableViewCell {
     delegate?.downloadTapped(self)
   }
 
-  func configure(track: Track, downloaded: Bool) {
+  func updateDisplay(progress: Float, totalSize: String) {
+    progressView.progress = progress
+    progressLabel.text = String(format: "%.1f%% of %@",progress * 100, totalSize)
+  }
+  
+  func configure(track: Track, downloaded: Bool, download: Download?) {
+    
     titleLabel.text = track.name
     artistLabel.text = track.artist
 
+    print(" >> reload... ", track.name)
+    
     // Show/hide download controls Pause/Resume, Cancel buttons, progress info
-    // TODO
+    var showDownloadControls = false
     // Non-nil Download object means a download is in progress
-    // TODO
+    if let download = download {
+      showDownloadControls = true
+      
+      let title = download.isDownloading ? "Pause" : "Resume"
+      pauseButton.setTitle(title, for: .normal)
+      progressLabel.text = download.isDownloading ? "Download..." : "Paused"
+      pauseButton.isHidden = !showDownloadControls
+      cancelButton.isHidden = !showDownloadControls
+      progressLabel.isHidden = !showDownloadControls
+      progressView.isHidden = !showDownloadControls
+    }
     
     // If the track is already downloaded, enable cell selection and hide the Download button
     selectionStyle = downloaded ? UITableViewCellSelectionStyle.gray : UITableViewCellSelectionStyle.none
-    downloadButton.isHidden = downloaded
+    downloadButton.isHidden = downloaded || showDownloadControls
   }
-
 }
